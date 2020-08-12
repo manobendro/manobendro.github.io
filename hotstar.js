@@ -1,4 +1,4 @@
-var subList = [];
+var subList = []; //Global Veriable
 function parseMasterList(xhrRes){
     var masterData = xhrRes.toString();
     for(let line of masterData.split(atob('Cg=='))){
@@ -8,7 +8,7 @@ function parseMasterList(xhrRes){
     }
     load(basePath+"/"+subList[video_quality], parseList);
 }
-var chunkList = [];
+var chunkList = []; //Global Veriable
 function parseList(xhrRes){
     var masterData = xhrRes.toString();
     for(let line of masterData.split(atob('Cg=='))){
@@ -20,7 +20,7 @@ function parseList(xhrRes){
     zip.file('index.m3u8', xhrRes);
     chunkDownloader(0);
 }
-var basePath = "";
+var basePath = ""; //Global Veriable
 function load(url,callback){
     var spiltUrl = url.split('?');
     basePath = spiltUrl[0].substr(0,spiltUrl[0].lastIndexOf('/'));
@@ -50,9 +50,13 @@ function chunkDownloader(chunk){
         chunkDownloader(chunk+1);
     });
 }
-var video_quality = 5;
-var zip = new JSZip();
+var video_quality = 5; //Global Veriable
+var zip = new JSZip(); //Global Veriable
 function start_download(url, quality){
+	subList = [];
+	chunkList = [];
+	basePath = "";
+	zip = new JSZip();
 	video_quality = quality;
 	load(url, parseMasterList);
 }
