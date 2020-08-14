@@ -39,6 +39,7 @@ function load(url,callback){
     xhr.send();
 }
 var rTry = 0;
+var isFullUrl = true;
 function chunkDownloader(chunk){
     if(chunk >= chunkList.length || rTry > 5){
         console.log("Finished...");
@@ -50,6 +51,7 @@ function chunkDownloader(chunk){
 	var host = '';
 	if(!chunkList[chunk].startsWith('http')){
 		host = basePath + '/';
+		isFullUrl = false;
 	}
 	
     fetch(host + chunkList[chunk],{credentials:'include'}) //TODO check basePath
@@ -63,8 +65,15 @@ function chunkDownloader(chunk){
 	})
     .then(blob => {
 	if(blob != undefined){
-		console.log("Downloader chunk: "+chunkList[chunk]);
-		zip.file(chunkList[chunk].trim(), blob);
+			if(isFullUrl){
+				var fName = chunkList[chunk].split('?');
+				fName[0] = fName[0].substr(fName[0].lastIndexOf('/')+1);
+				zip.file(fName[0].trim(), blob);
+				console.log("Downloader chunk: "+fName[0].trim());
+			}else{
+				console.log("Downloader chunk: "+chunkList[chunk].trim());
+				zip.file(chunkList[chunk].trim(), blob);
+			}
 		chunkDownloader(chunk+1);
 	}	
     });
