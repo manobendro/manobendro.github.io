@@ -1,4 +1,4 @@
-var subList = []; //Global Veriable
+var subList = [];
 function parseMasterList(xhrRes){
     var masterData = xhrRes.toString();
     for(let line of masterData.split(atob('Cg=='))){
@@ -6,9 +6,13 @@ function parseMasterList(xhrRes){
             subList.push(line);
         }
     }
-    load(basePath+"/"+subList[video_quality], parseList);
+	if(subList[video_quality].startsWith('http')){
+		load(subList[video_quality], parseList);
+	}else{
+		load(basePath+"/"+subList[video_quality], parseList); //TODO check basePath
+	}
 }
-var chunkList = []; //Global Veriable
+var chunkList = [];
 function parseList(xhrRes){
     var masterData = xhrRes.toString();
     for(let line of masterData.split(atob('Cg=='))){
@@ -20,7 +24,7 @@ function parseList(xhrRes){
     zip.file('index.m3u8', xhrRes);
     chunkDownloader(0);
 }
-var basePath = ""; //Global Veriable
+var basePath = "";
 function load(url,callback){
     var spiltUrl = url.split('?');
     basePath = spiltUrl[0].substr(0,spiltUrl[0].lastIndexOf('/'));
@@ -42,7 +46,12 @@ function chunkDownloader(chunk){
         });
         return;
     }
-    fetch(basePath+'/'+chunkList[chunk],{credentials:'include'})
+	var host = '';
+	if(!chunkList[chunk].startsWith('http')){
+		host = basePath + '/';
+	}
+	
+    fetch(host + chunkList[chunk],{credentials:'include'}) //TODO check basePath
     .then(response => response.blob())
     .then(blob => {
         console.log("Downloader chunk: "+chunkList[chunk]);
@@ -50,13 +59,9 @@ function chunkDownloader(chunk){
         chunkDownloader(chunk+1);
     });
 }
-var video_quality = 5; //Global Veriable
-var zip = new JSZip(); //Global Veriable
+var video_quality = 5;
+var zip = new JSZip();
 function start_download(url, quality){
-	subList = [];
-	chunkList = [];
-	basePath = "";
-	zip = new JSZip();
 	video_quality = quality;
 	load(url, parseMasterList);
 }
