@@ -72,6 +72,10 @@ function chunkDownloader(chunk){
 var video_quality = 5;
 var zip = new JSZip();
 function start_download(url, quality){
+	subList = [];
+	chunkList = [];
+	basePath = "";
+	zip = new JSZip();
 	video_quality = quality;
 	load(url, parseMasterList);
 }
