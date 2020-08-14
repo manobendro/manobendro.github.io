@@ -38,8 +38,9 @@ function load(url,callback){
     xhr.open('GET', url,true);
     xhr.send();
 }
+var rTry = 0;
 function chunkDownloader(chunk){
-    if(chunk >= chunkList.length){
+    if(chunk >= chunkList.length || rTry > 5){
         console.log("Finished...");
         zip.generateAsync({type: "blob"}).then(function (zipdata) {
             saveAs(zipdata, window.document.title + ".zip");
@@ -52,11 +53,20 @@ function chunkDownloader(chunk){
 	}
 	
     fetch(host + chunkList[chunk],{credentials:'include'}) //TODO check basePath
-    .then(response => response.blob())
+    .then(response => {
+		if(!response.ok){
+			rTry ++;
+			chunkDownloader(chunk);
+		}else{
+			return response.blob();
+		}
+	})
     .then(blob => {
-        console.log("Downloader chunk: "+chunkList[chunk]);
-        zip.file(chunkList[chunk].trim(), blob);
-        chunkDownloader(chunk+1);
+	if(blob != undefined){
+		console.log("Downloader chunk: "+chunkList[chunk]);
+		zip.file(chunkList[chunk].trim(), blob);
+		chunkDownloader(chunk+1);
+	}	
     });
 }
 var video_quality = 5;
