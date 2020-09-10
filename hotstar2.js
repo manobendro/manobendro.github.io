@@ -67,7 +67,7 @@ function chunkDownloader(chunk, length){
     .then(response => {
 		if(!response.ok){
 			rTry ++;
-			chunkDownloader(chunk);
+			chunkDownloader(chunk, length);
 		}else{
 			return response.blob();
 		}
@@ -83,7 +83,7 @@ function chunkDownloader(chunk, length){
 				console.log("Downloader chunk: "+chunkList[chunk].trim());
 				zip.file(chunkList[chunk].trim(), blob);
 			}
-		chunkDownloader(chunk+1);
+		chunkDownloader(chunk+1, length);
 	}	
     });
 }
